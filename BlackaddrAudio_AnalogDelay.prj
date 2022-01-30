@@ -1,0 +1,144 @@
+{
+  "company": "Blackaddr Audio",
+  "effectName": "Analog Delay",
+  "effectVersion": "0.1.0",
+  "effectShortName": "AnaDly",
+  "effectCategory": "Delay",
+  "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
+  "numInputs": 1,
+  "numOutputs": 1,
+  "numControls": 6,
+  "effectFilename": "BlackaddrAudio_AnalogDelay.efx",
+  "libraryName": "BlackaddrAudio_AnalogDelay",
+  "cppClass": "BlackaddrAudio_AnalogDelay::AnalogDelay",
+  "cppInstBase": "_BlackaddrAudio_AnalogDelay",
+  "constructorParams": "200.0f",
+  "controls": [
+    {
+      "name": "Bypass",
+      "shortName": "EN",
+      "description": "Bypasses the effect.",
+      "config": [
+        0,
+        0.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "iconOn": "gfx/StompUp.png",
+      "iconOff": "gfx/StompDown.png",
+      "position": [
+        311,
+        815
+      ],
+      "scalingRatio": 2.400000095367432
+    },
+    {
+      "name": "Filter",
+      "shortName": "FLTR",
+      "description": "Select one of several tone filters.",
+      "config": [
+        2,
+        0.0,
+        2.0,
+        0.0,
+        1.0
+      ],
+      "iconEncoder": "gfx/encoder.png",
+      "enums": [
+        "BBD",
+        "Warm",
+        "Dark"
+      ],
+      "position": [
+        311,
+        620
+      ],
+      "scalingRatio": 3.5,
+      "supressValueLabel": 1
+    },
+    {
+      "name": "Delay",
+      "shortName": "DLY",
+      "description": "Controls the delay from 0ms to 200ms.",
+      "config": [
+        3,
+        0.0,
+        10.0,
+        5.0,
+        0.1000000014901161
+      ],
+      "iconPot": "gfx/pot.png",
+      "potFullRange": 1,
+      "position": [
+        132,
+        160
+      ],
+      "scalingRatio": 2.700000047683716,
+      "supressValueLabel": 1
+    },
+    {
+      "name": "Mix",
+      "shortName": "MIX",
+      "description": "Sets the amout of delay signal mixed in with the original, from 0% to 100%.",
+      "config": [
+        3,
+        0.0,
+        10.0,
+        5.0,
+        0.1000000014901161
+      ],
+      "iconPot": "gfx/pot.png",
+      "potFullRange": 1,
+      "position": [
+        493,
+        160
+      ],
+      "scalingRatio": 2.700000047683716,
+      "supressValueLabel": 1
+    },
+    {
+      "name": "Feedback",
+      "shortName": "FBK",
+      "description": "Sets the amount of delay signal fed back to the input, from 0% to 100%.",
+      "config": [
+        3,
+        0.0,
+        10.0,
+        0.0,
+        0.1000000014901161
+      ],
+      "iconPot": "gfx/pot.png",
+      "potFullRange": 1,
+      "position": [
+        311,
+        160
+      ],
+      "scalingRatio": 2.700000047683716,
+      "supressValueLabel": 1
+    },
+    {
+      "name": "Volume",
+      "shortName": "VOL",
+      "description": "Sets the output volume from -40dB to +10dB.",
+      "config": [
+        3,
+        0.0,
+        10.0,
+        8.0,
+        0.1000000014901161
+      ]
+    }
+  ],
+  "companyLogo": "gfx/BlackaddrLogo.png",
+  "pedalIcon": "gfx/AnalogDelayIcon.png",
+  "basePedal": "gfx/AnalogDelayBasePedal.png",
+  "publicHeaderFiles": [
+    "inc/AnalogDelay.h",
+    "inc/AnalogDelayFilters.h"
+  ],
+  "privateSourceFiles": [
+    "src/AnalogDelayBase.cpp",
+    "src/AnalogDelay.cpp"
+  ]
+}
