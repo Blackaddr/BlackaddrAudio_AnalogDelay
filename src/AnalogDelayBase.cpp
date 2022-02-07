@@ -8,7 +8,7 @@
 #include <cmath>
 #include "baCore/DebugPrint.h"
 #include "baCore/LibBasicFunctions.h"
-#include "BlackaddrAudio_AnalogDelay/AnalogDelay.h"
+#include "AnalogDelay.h"
 
 using namespace baCore;
 
