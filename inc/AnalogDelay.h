@@ -12,6 +12,9 @@
 #include "baCore/AudioEffectWrapper.h"
 
 //!s - START_USER_INCLUDES - put your #includes below this line before the matching END
+#include "Avalon/SramManager.h"
+
+extern Avalon::SramManager* sramManagerPtr;
 //!e - END_USER_INCLUDES
 
 namespace BlackaddrAudio_AnalogDelay {
@@ -50,17 +53,12 @@ public:
     /// Construct an analog delay using internal memory by specifying the maximum
     /// delay in milliseconds.
     /// @param maxDelayMs maximum delay in milliseconds. Larger delays use more memory.
-    AnalogDelay(float maxDelayMs);
-
-    /// Construct an analog delay using internal memory by specifying the maximum
-    /// delay in audio samples.
-    /// @param numSamples maximum delay in audio samples. Larger delays use more memory.
-    //AnalogDelay(size_t numSamples);
+    AnalogDelay(float maxDelayMs, bool useExtMem = false);
 
     /// Construct an analog delay using external SPI via an ExtMemSlot. The amount of
     /// delay will be determined by the amount of memory in the slot.
     /// @param slot A pointer to the ExtMemSlot to use for the delay.
-    //AnalogDelay(baCore::ExtMemSlot *slot); // requires sufficiently sized pre-allocated memory
+    //AnalogDelay(float maxDelayMs); // requires sufficiently sized pre-allocated memory
     //!e - END_USER_CONSTRUCTORS
 
     virtual ~AnalogDelay();
@@ -125,6 +123,10 @@ private:
     audio_block_t* m_basicInputCheck(audio_block_t* inputAudioBlock, unsigned outputChannel);
 
     //!s - START_USER_PRIVATE_MEMBERS - put your private members below this line before the matching END
+    bool m_extMemConfigured = false;
+    baCore::ExtMemSlot* m_slot = nullptr;
+    bool m_slotCleared = false;
+    //static constexpr float FEEDBACK_LIMIT_F = 1.0f;
     bool                m_externalMemory  = false;
     baCore::AudioDelay *m_memory          = nullptr;
     size_t              m_maxDelaySamples = 0;
@@ -135,6 +137,7 @@ private:
 
     size_t m_delaySamples = 0;
 
+    void m_configExtMem();
     void m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
     void m_postProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
 
