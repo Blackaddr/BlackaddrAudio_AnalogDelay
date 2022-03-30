@@ -12,6 +12,7 @@
 #include "AnalogDelayFilters.h"
 
 using namespace baCore;
+using namespace Avalon;
 
 namespace BlackaddrAudio_AnalogDelay {
 
@@ -345,8 +346,8 @@ void AnalogDelay::delayFractionMax(float delayFraction)
     if (!m_externalMemory) {
         // internal memory
         m_maxDelaySamples = m_memory->getMaxDelaySamples();
-        QueuePosition queuePosition = calcQueuePosition(delaySamples);
-        Serial.println(String("CONFIG: delay:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset);
+        //QueuePosition queuePosition = calcQueuePosition(delaySamples);
+        //Serial.println(String("CONFIG: delay:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset);
     } else {
         // external memory
         //Serial.println(String("CONFIG: delay:") + delaySamples);

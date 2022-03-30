@@ -13,8 +13,6 @@
 
 //!s - START_USER_INCLUDES - put your #includes below this line before the matching END
 #include "Avalon/SramManager.h"
-
-extern Avalon::SramManager* sramManagerPtr;
 //!e - END_USER_INCLUDES
 
 namespace BlackaddrAudio_AnalogDelay {
