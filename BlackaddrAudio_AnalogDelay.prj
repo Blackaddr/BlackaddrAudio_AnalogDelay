@@ -1,4 +1,5 @@
 {
+  "efxFileVersion": "1.0.0",
   "company": "Blackaddr Audio",
   "effectName": "Analog Delay",
   "effectVersion": "0.1.0",
@@ -137,6 +138,7 @@
       ]
     }
   ],
+  "projectFileVersion": "1.0.0",
   "companyLogo": "gfx/BlackaddrLogo.png",
   "pedalIcon": "gfx/AnalogDelayIcon.png",
   "basePedal": "gfx/AnalogDelayBasePedal.png",
