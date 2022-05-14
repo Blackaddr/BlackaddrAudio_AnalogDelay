@@ -9,10 +9,10 @@
 
 #include <Audio.h>
 #include <arm_math.h>
-#include "baCore/AudioEffectWrapper.h"
+#include "Aviate/AudioEffectWrapper.h"
 
 //!s - START_USER_INCLUDES - put your #includes below this line before the matching END
-#include "Avalon/SramManager.h"
+#include "Aviate/SramManager.h"
 //!e - END_USER_INCLUDES
 
 namespace BlackaddrAudio_AnalogDelay {
@@ -20,7 +20,7 @@ namespace BlackaddrAudio_AnalogDelay {
 //!s - START_USER_EFFECT_TYPES - put your effect types below this line before the matching END
 //!e - END_USER_EFFECT_TYPES
 
-class AnalogDelay : public AudioStream, public baCore::AudioEffectWrapper {
+class AnalogDelay : public AudioStream, public Aviate::AudioEffectWrapper {
 public:
     static constexpr unsigned NUM_INPUTS  = 1;
     static constexpr unsigned NUM_OUTPUTS = 1;
@@ -45,7 +45,7 @@ public:
     };
     //!e - END_USER_CLASS_TYPES
 
-    AnalogDelay() = delete;
+    AnalogDelay();
 
     //!s - START_USER_CONSTRUCTORS - put your custom constructors below this line before the matching END
     /// Construct an analog delay using internal memory by specifying the maximum
@@ -122,16 +122,16 @@ private:
 
     //!s - START_USER_PRIVATE_MEMBERS - put your private members below this line before the matching END
     bool m_extMemConfigured = false;
-    baCore::ExtMemSlot* m_slot = nullptr;
-    bool m_slotCleared = false;
+    Aviate::SramMemSlot* m_slot = nullptr;
+    //bool m_slotCleared = false;
     //static constexpr float FEEDBACK_LIMIT_F = 1.0f;
     bool                m_externalMemory  = false;
-    baCore::AudioDelay *m_memory          = nullptr;
+    Aviate::AudioDelay *m_memory          = nullptr;
     size_t              m_maxDelaySamples = 0;
 
     audio_block_t             *m_previousBlock  = nullptr;
     audio_block_t             *m_blockToRelease = nullptr;
-    baCore::IirBiQuadFilterHQ *m_iir            = nullptr;
+    Aviate::IirBiQuadFilterHQ *m_iir            = nullptr;
 
     size_t m_delaySamples = 0;
 

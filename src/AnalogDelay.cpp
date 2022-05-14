@@ -7,12 +7,12 @@
  */
 #include <cmath> // used for std::round
 #include "baCore/DebugPrint.h"
-#include "baCore/LibBasicFunctions.h"
+#include "Aviate/LibBasicFunctions.h"
 #include "AnalogDelay.h"
 #include "AnalogDelayFilters.h"
 
 using namespace baCore;
-using namespace Avalon;
+using namespace Aviate;
 
 namespace BlackaddrAudio_AnalogDelay {
 
@@ -22,7 +22,7 @@ AnalogDelay::AnalogDelay(float maxDelayMs, bool useExtMem)
     m_maxDelaySamples = calcAudioSamples(maxDelayMs);
     m_constructFilter();
 
-    if (useExtMem) {
+    if (useExtMem && sramManagerPtr) {
         m_externalMemory = true;
         m_configExtMem();
     } else {
@@ -68,10 +68,10 @@ void AnalogDelay::setFilter(Filter filter)
 void AnalogDelay::update(void)
 {
 
-    if  (m_externalMemory && m_enable && !m_slotCleared) {
-        m_slot->clear();
-        m_slotCleared = true;
-    }
+    // if  (m_externalMemory && m_enable && !m_slotCleared) {
+    //     //m_slot->clear();
+    //     m_slotCleared = true;
+    // }
 
     audio_block_t *inputAudioBlock = receiveReadOnly(); // get the next block of input samples
 
@@ -85,7 +85,7 @@ void AnalogDelay::update(void)
             release(m_previousBlock);
             m_previousBlock = nullptr;
         }
-        if (!m_externalMemory) {
+        if (!m_externalMemory && m_memory) {
             // when using internal memory we have to release all references in the ring buffer
             while (m_memory->getRingBuffer()->size() > 0) {
                 audio_block_t *releaseBlock = m_memory->getRingBuffer()->front();
@@ -97,7 +97,7 @@ void AnalogDelay::update(void)
     }
 
     // Check is block is bypassed, if so either transmit input directly or create silence
-    if ((m_bypass == true) || !(inputAudioBlock)) {
+    if ((m_bypass == true) || !(inputAudioBlock) || !m_memory) {
 
         // transmit the input directly
         if (!inputAudioBlock) {
@@ -167,64 +167,6 @@ void AnalogDelay::update(void)
     m_blockToRelease = blockToRelease;
 }
 
-//void AnalogDelay::update(void)
-//{
-//    audio_block_t *inputAudioBlock = receiveReadOnly(); // get the next block of input samples
-//
-//    inputAudioBlock = m_basicInputCheck(inputAudioBlock, 0); // check for disable mode, bypass, or invalid inputs.
-//    if (!inputAudioBlock) { return; }
-//
-//    // Update the peak value
-//    m_updateInputPeak(inputAudioBlock);
-//
-//    // Otherwise perform normal processing
-//    // In order to make use of the SPI DMA, we need to request the read from memory first,
-//    // then do other processing while it fills in the back.
-//    audio_block_t *blockToOutput = nullptr; // this will hold the output audio
-//    blockToOutput = allocate();
-//    if (!blockToOutput) {
-//        transmit(inputAudioBlock);
-//        release(inputAudioBlock);
-//        return; // skip this update cycle due to failure
-//    }
-//
-//    // get the data. If using external memory with DMA, this won't be filled until
-//    // later.
-//    m_memory->getSamples(blockToOutput, m_delaySamples);
-//
-//    // If using DMA, we need something else to do while that read executes, so
-//    // move on to input preprocessing
-//
-//    // Preprocessing
-//    audio_block_t *preProcessed = allocate();
-//    // mix the input with the feedback path in the pre-processing stage
-//    m_preProcessing(preProcessed, inputAudioBlock, m_previousBlock);
-//
-//    // consider doing the BBD post processing here to use up more time while waiting
-//    // for the read data to come back
-//    audio_block_t *blockToRelease = m_memory->addBlock(preProcessed);
-//
-//
-//    // BACK TO OUTPUT PROCESSING
-//    // Check if external DMA, if so, we need to be sure the read is completed
-//    if (m_externalMemory && m_memory->getSlot()->isUseDma()) {
-//        // Using DMA
-//        while (m_memory->getSlot()->isReadBusy()) {}
-//    }
-//
-//    // perform the wet/dry mix mix
-//    m_postProcessing(blockToOutput, inputAudioBlock, blockToOutput);
-//    m_updateOutputPeak(blockToOutput);
-//    transmit(blockToOutput);
-//
-//    release(inputAudioBlock);
-//    if (m_previousBlock) { release(m_previousBlock); }
-//    m_previousBlock = blockToOutput;
-//
-//    if (m_blockToRelease) { release(m_blockToRelease); }
-//    m_blockToRelease = blockToRelease;
-//}
-
 void AnalogDelay::m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet)
 {
     if ( out && dry && wet) {
@@ -242,7 +184,6 @@ void AnalogDelay::m_postProcessing(audio_block_t *out, audio_block_t *dry, audio
 
     if ( out && dry && wet) {
         // Simulate the LPF IIR nature of the analog systems
-        //m_iir->process(wet->data, wet->data, AUDIO_BLOCK_SAMPLES);
         alphaBlend(out, dry, wet, m_mix);
     } else if (dry) {
         memcpy(out->data, dry->data, sizeof(int16_t) * AUDIO_BLOCK_SAMPLES);
@@ -257,23 +198,19 @@ void AnalogDelay::m_configExtMem()
     if (!m_extMemConfigured){
 
         // the delay cannot be exactly equal to the slot size, you need at least one sample so the wr/rd are not on top of each other.
-        m_slot = new ExtMemSlot();
-        if (!m_slot || !sramManagerPtr) {
-            DEBUG_PRINT(Serial.println("AnalogDelay::m_configExtMem(): slot or manager does not exist"));
+        m_slot = sramManagerPtr->requestMemory((m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t), true);  // true-> clear memory
+        if (!m_slot) {
+            DEBUG_PRINT(Serial.println("AnalogDelay::m_configExtMem(): ERROR creating memory slot"));
             return;
         }
 
-        //bool requestMemory(baCore::ExtMemSlot *slot, float delayMilliseconds, bool useDma = false);
-        if (!sramManagerPtr->requestMemory(m_slot, (m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t))) {
-            DEBUG_PRINT(Serial.println("AnalogDelay::m_configExtMem(): ERROR creating memory slot"));
-        }
-        //m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
-
         m_memory = new AudioDelay(m_slot);
-
+        if (!m_memory) { 
+            m_slot = nullptr;
+            return;
+        }
         m_extMemConfigured = true;
     }
-
 }
 
 void AnalogDelay::delayMs(float milliseconds)
@@ -289,15 +226,10 @@ void AnalogDelay::delayMs(float milliseconds)
         //Serial.println(String("CONFIG: delay:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset);
     } else {
         // external memory
-        ExtMemSlot *slot = m_memory->getSlot();
+        SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { Serial.println("ERROR: slot ptr is not valid");  return;}
 
         m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
-
-        if (!slot->isEnabled()) {
-            slot->enable();
-            Serial.println("WEIRD: slot was not enabled");
-        }
     }
 
     if (delaySamples > m_maxDelaySamples) {
@@ -319,13 +251,10 @@ void AnalogDelay::delaySamples(size_t numDelaySamples)
     } else {
         // external memory
         //Serial.println(String("CONFIG: delay:") + delaySamples);
-        ExtMemSlot *slot = m_memory->getSlot();
+        SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
         m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
-        if (!slot->isEnabled()) {
-            slot->enable();
-        }
     }
 
     if (numDelaySamples > m_maxDelaySamples) {
@@ -351,13 +280,10 @@ void AnalogDelay::delayFractionMax(float delayFraction)
     } else {
         // external memory
         //Serial.println(String("CONFIG: delay:") + delaySamples);
-        ExtMemSlot *slot = m_memory->getSlot();
+        SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
         m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
-        if (!slot->isEnabled()) {
-            slot->enable();
-        }
     }
 
     if (delaySamples > m_maxDelaySamples) {
@@ -399,7 +325,6 @@ void AnalogDelay::feedback(float value)
 void AnalogDelay::volume(float value)
 {
     // perform any necessary conversion to user variables, validation, etc.
-    //m_volume = value;
     volumeDb(-40.0f + (value * 50.0f)); // 50db dynamic range
 }
 
