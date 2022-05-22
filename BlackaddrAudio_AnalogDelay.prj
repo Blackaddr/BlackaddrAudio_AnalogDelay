@@ -3,7 +3,7 @@
   "company": "Blackaddr Audio",
   "effectName": "Analog Delay",
   "effectVersion": "0.1.0",
-  "coreVersion": "0.5.0",
+  "coreVersion": "0.6.0",
   "effectShortName": "AnaDly",
   "effectCategory": "Delay",
   "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
@@ -18,7 +18,7 @@
   "controls": [
     {
       "name": "Bypass",
-      "shortName": "EN",
+      "shortName": "BYP",
       "description": "Bypasses the effect.",
       "config": [
         0,
@@ -35,7 +35,8 @@
         311,
         815
       ],
-      "scalingRatio": 2.400000095367432
+      "scalingRatio": 2.400000095367432,
+      "userData": 1
     },
     {
       "name": "Filter",
@@ -60,7 +61,8 @@
         620
       ],
       "scalingRatio": 3.5,
-      "supressValueLabel": 1
+      "supressValueLabel": 1,
+      "userData": 0
     },
     {
       "name": "Delay",
@@ -81,7 +83,8 @@
         160
       ],
       "scalingRatio": 2.700000047683716,
-      "supressValueLabel": 1
+      "supressValueLabel": 1,
+      "userData": 0
     },
     {
       "name": "Mix",
@@ -102,7 +105,8 @@
         160
       ],
       "scalingRatio": 2.700000047683716,
-      "supressValueLabel": 1
+      "supressValueLabel": 1,
+      "userData": 0
     },
     {
       "name": "Feedback",
@@ -123,7 +127,8 @@
         160
       ],
       "scalingRatio": 2.700000047683716,
-      "supressValueLabel": 1
+      "supressValueLabel": 1,
+      "userData": 0
     },
     {
       "name": "Volume",
@@ -135,7 +140,8 @@
         10.0,
         8.0,
         0.1000000014901161
-      ]
+      ],
+      "userData": 0
     }
   ],
   "projectFileVersion": "1.0.0",
