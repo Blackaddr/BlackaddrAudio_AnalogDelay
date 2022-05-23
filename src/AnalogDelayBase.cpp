@@ -25,7 +25,6 @@ void AnalogDelay::mapMidiControl(int parameter, int midiCC, int midiChannel)
 
 void AnalogDelay::setParam(int paramIndex, float paramValue)
 {
-    EFX_PRINT(Serial.printf("AnalogDelay::setParam(): setting param %d to %0.2f\n\r", paramIndex, paramValue));
     switch(paramIndex) {
     case 0 : bypass( (paramValue - 0.000000) / (1.000000 - 0.000000) ); break;
     case 1 : filter( (paramValue - 0.000000) / (2.000000 - 0.000000) ); break;
@@ -42,37 +41,31 @@ void AnalogDelay::processMidi(int channel, int control, int value)
     float val = (float)value / 127.0f;
 
     if ((m_midiConfig[Bypass_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Bypass_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Bypass: ") + val + String("%")));
         bypass(val);
         return;
     }
 
     if ((m_midiConfig[Filter_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Filter_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Filter: ") + val + String("%")));
         filter(val);
         return;
     }
 
     if ((m_midiConfig[Delay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Delay_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Delay: ") + val + String("%")));
         delay(val);
         return;
     }
 
     if ((m_midiConfig[Mix_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Mix_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Mix: ") + val + String("%")));
         mix(val);
         return;
     }
 
     if ((m_midiConfig[Feedback_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Feedback_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Feedback: ") + val + String("%")));
         feedback(val);
         return;
     }
 
     if ((m_midiConfig[Volume_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Volume_e][MIDI_CONTROL] == control)) {
-        EFX_PRINT(Serial.println(String("BlackaddrAudio_AnalogDelay::Volume: ") + val + String("%")));
         volume(val);
         return;
     }
