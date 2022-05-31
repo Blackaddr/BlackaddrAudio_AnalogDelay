@@ -27,9 +27,9 @@
         1.0,
         1.0
       ],
-      "iconOn": "gfx/StompDownRedLed.png",
+      "iconOn": "gfx/StompUpRedLed.png",
       "iconOnHeight": 216,
-      "iconOff": "gfx/StompUpRedLed.png",
+      "iconOff": "gfx/StompDownRedLed.png",
       "iconOffHeight": 0,
       "position": [
         310,
