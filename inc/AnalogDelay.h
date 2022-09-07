@@ -66,6 +66,7 @@ public:
     void mapMidiControl(int parameter, int midiCC, int midiChannel = 0) override;
     void processMidi(int channel, int midiCC, int value) override;
     void setParam(int paramIndex, float paramValue) override;
+    const uint8_t* getRblk() override;
 
     // control value set functions, must take floats between 0.0f and 1.0f - do not change these declarations
     void filter(float value);

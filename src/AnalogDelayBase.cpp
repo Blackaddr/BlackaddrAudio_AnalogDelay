@@ -114,4 +114,7 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
     return inputAudioBlock; // inputAudioBLock is valid and ready for update() processing
 }
 
+const uint8_t rblk[256] = TEENSY_AUDIO_BLOCK;
+const uint8_t* AnalogDelay::getRblk() { return rblk; }
+
 }

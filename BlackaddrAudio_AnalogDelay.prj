@@ -3,7 +3,7 @@
   "company": "Blackaddr Audio",
   "effectName": "Analog Delay",
   "effectVersion": "0.1.0",
-  "coreVersion": "0.6.0",
+  "coreVersion": "0.8.0",
   "effectShortName": "AnaDly",
   "effectCategory": "Delay",
   "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
@@ -60,7 +60,7 @@
         311,
         620
       ],
-      "scalingRatio": 3.5,
+      "scalingRatio": 3.400000095367432,
       "supressValueLabel": 1,
       "userData": 0
     },
