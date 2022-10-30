@@ -28,8 +28,8 @@ public:
     // List of effect control names
     enum {
         Bypass_e = 0,
-        Filter_e = 1,
-        Delay_e = 2,
+        Delay_e = 1,
+        Filter_e = 2,
         Mix_e = 3,
         Feedback_e = 4,
         Volume_e = 5,
@@ -66,11 +66,12 @@ public:
     void mapMidiControl(int parameter, int midiCC, int midiChannel = 0) override;
     void processMidi(int channel, int midiCC, int value) override;
     void setParam(int paramIndex, float paramValue) override;
+    const char* getName() override;
     const uint8_t* getRblk() override;
 
     // control value set functions, must take floats between 0.0f and 1.0f - do not change these declarations
-    void filter(float value);
     void delay(float value);
+    void filter(float value);
     void mix(float value);
     void feedback(float value);
     void volume(float value) override;
@@ -114,8 +115,8 @@ private:
     int m_midiConfig[NUM_CONTROLS][2]; // stores the midi parameter mapping
 
     // m_bypass and m_volume are already provided by the base class AudioEffectWrapper
-    float m_filter = 0.0f;
     float m_delay = 0.0f;
+    float m_filter = 0.0f;
     float m_mix = 0.0f;
     float m_feedback = 0.0f;
 
@@ -126,9 +127,9 @@ private:
     Aviate::SramMemSlot* m_slot = nullptr;
     //bool m_slotCleared = false;
     //static constexpr float FEEDBACK_LIMIT_F = 1.0f;
-    bool                m_externalMemory  = false;
-    Aviate::AudioDelay *m_memory          = nullptr;
-    size_t              m_maxDelaySamples = 0;
+    bool                m_useExternalMemory  = false;
+    Aviate::AudioDelay *m_memory             = nullptr;
+    size_t              m_maxDelaySamples    = 0;
 
     audio_block_t             *m_previousBlock  = nullptr;
     audio_block_t             *m_blockToRelease = nullptr;

@@ -27,8 +27,8 @@ void AnalogDelay::setParam(int paramIndex, float paramValue)
 {
     switch(paramIndex) {
     case 0 : bypass( (paramValue - 0.000000) / (1.000000 - 0.000000) ); break;
-    case 1 : filter( (paramValue - 0.000000) / (2.000000 - 0.000000) ); break;
-    case 2 : delay( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
+    case 1 : delay( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
+    case 2 : filter( (paramValue - 0.000000) / (2.000000 - 0.000000) ); break;
     case 3 : mix( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
     case 4 : feedback( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
     case 5 : volume( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
@@ -45,13 +45,13 @@ void AnalogDelay::processMidi(int channel, int control, int value)
         return;
     }
 
-    if ((m_midiConfig[Filter_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Filter_e][MIDI_CONTROL] == control)) {
-        filter(val);
+    if ((m_midiConfig[Delay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Delay_e][MIDI_CONTROL] == control)) {
+        delay(val);
         return;
     }
 
-    if ((m_midiConfig[Delay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Delay_e][MIDI_CONTROL] == control)) {
-        delay(val);
+    if ((m_midiConfig[Filter_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Filter_e][MIDI_CONTROL] == control)) {
+        filter(val);
         return;
     }
 
@@ -116,5 +116,6 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
 
 const uint8_t rblk[256] = TEENSY_AUDIO_BLOCK;
 const uint8_t* AnalogDelay::getRblk() { return rblk; }
+const char* AnalogDelay::getName() { return "Blackaddr Audio:Analog Delay"; }
 
 }

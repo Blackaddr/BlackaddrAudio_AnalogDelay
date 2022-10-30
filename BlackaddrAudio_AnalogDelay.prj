@@ -3,7 +3,7 @@
   "company": "Blackaddr Audio",
   "effectName": "Analog Delay",
   "effectVersion": "0.1.0",
-  "coreVersion": "0.8.0",
+  "coreVersion": "1.0.0",
   "effectShortName": "AnaDly",
   "effectCategory": "Delay",
   "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
@@ -14,7 +14,7 @@
   "libraryName": "BlackaddrAudio_AnalogDelay",
   "cppClass": "BlackaddrAudio_AnalogDelay::AnalogDelay",
   "cppInstBase": "_BlackaddrAudio_AnalogDelay",
-  "constructorParams": "200.0f",
+  "constructorParams": "2000.0f,true",
   "controls": [
     {
       "name": "Bypass",
@@ -27,9 +27,9 @@
         1.0,
         1.0
       ],
-      "iconOn": "gfx/StompUpRedLed.png",
+      "iconOn": "gfx\\StompUpRedLed.png",
       "iconOnHeight": 216,
-      "iconOff": "gfx/StompDownRedLed.png",
+      "iconOff": "gfx\\StompDownRedLed.png",
       "iconOffHeight": 0,
       "position": [
         310,
@@ -37,6 +37,28 @@
       ],
       "scalingRatio": 1.149999976158142,
       "userData": 1
+    },
+    {
+      "name": "Delay",
+      "shortName": "DLY",
+      "description": "Controls the delay from 0ms to 2000 ms.",
+      "config": [
+        3,
+        0.0,
+        10.0,
+        5.0,
+        0.1000000014901161
+      ],
+      "iconPot": "gfx\\pot.png",
+      "iconPotHeight": 70,
+      "potFullRange": 1,
+      "position": [
+        132,
+        160
+      ],
+      "scalingRatio": 2.700000047683716,
+      "supressValueLabel": 1,
+      "userData": 0
     },
     {
       "name": "Filter",
@@ -49,7 +71,7 @@
         0.0,
         1.0
       ],
-      "iconEncoder": "gfx/encoder.png",
+      "iconEncoder": "gfx\\encoder.png",
       "iconEncoderHeight": 61,
       "enums": [
         "BBD",
@@ -65,28 +87,6 @@
       "userData": 0
     },
     {
-      "name": "Delay",
-      "shortName": "DLY",
-      "description": "Controls the delay from 0ms to 200ms.",
-      "config": [
-        3,
-        0.0,
-        10.0,
-        5.0,
-        0.1000000014901161
-      ],
-      "iconPot": "gfx/pot.png",
-      "iconPotHeight": 70,
-      "potFullRange": 1,
-      "position": [
-        132,
-        160
-      ],
-      "scalingRatio": 2.700000047683716,
-      "supressValueLabel": 1,
-      "userData": 0
-    },
-    {
       "name": "Mix",
       "shortName": "MIX",
       "description": "Sets the amout of delay signal mixed in with the original, from 0% to 100%.",
@@ -97,7 +97,7 @@
         5.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx/pot.png",
+      "iconPot": "gfx\\pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -119,7 +119,7 @@
         0.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx/pot.png",
+      "iconPot": "gfx\\pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -145,15 +145,15 @@
     }
   ],
   "projectFileVersion": "1.0.0",
-  "companyLogo": "gfx/BlackaddrLogo.png",
-  "pedalIcon": "gfx/AnalogDelayIcon.png",
-  "basePedal": "gfx/AnalogDelayBasePedal.png",
+  "companyLogo": "gfx\\BlackaddrLogo.png",
+  "pedalIcon": "gfx\\AnalogDelayIcon.png",
+  "basePedal": "gfx\\AnalogDelayBasePedal.png",
   "publicHeaderFiles": [
-    "inc/AnalogDelay.h"
+    "inc\\AnalogDelay.h"
   ],
   "privateSourceFiles": [
-    "src/AnalogDelayBase.cpp",
-    "src/AnalogDelay.cpp",
-    "src/AnalogDelayFilters.h"
+    "src\\AnalogDelayBase.cpp",
+    "src\\AnalogDelay.cpp",
+    "src\\AnalogDelayFilters.h"
   ]
 }
