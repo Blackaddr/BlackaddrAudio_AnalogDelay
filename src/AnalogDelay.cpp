@@ -275,6 +275,8 @@ void AnalogDelay::delayFractionMax(float delayFraction)
 
     size_t delaySamples = static_cast<size_t>(static_cast<float>(m_memory->getMaxDelaySamples()) * delayFraction);
 
+    //EFX_PRINT(Serial.printf("delay is %f\n\r", delayFraction); Serial.flush());
+
     if (!m_useExternalMemory) {
         // internal memory
         m_maxDelaySamples = m_memory->getMaxDelaySamples();
