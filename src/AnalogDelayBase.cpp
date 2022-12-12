@@ -36,6 +36,19 @@ void AnalogDelay::setParam(int paramIndex, float paramValue)
     }
 }
 
+float AnalogDelay::getUserParamValue(int paramIndex, float normalizedParamValue)
+{
+    switch(paramIndex) {
+    case 0 : return ( ((1.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // bypass
+    case 1 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // delay
+    case 2 : return ( ((2.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // filter
+    case 3 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // mix
+    case 4 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // feedback
+    case 5 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // volume
+    default : return 0.0f;
+    }
+}
+
 void AnalogDelay::processMidi(int channel, int control, int value)
 {
     float val = (float)value / 127.0f;

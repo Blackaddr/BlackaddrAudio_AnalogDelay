@@ -27,9 +27,9 @@
         1.0,
         1.0
       ],
-      "iconOn": "gfx\\StompUpRedLed.png",
+      "iconOn": "gfx/StompUpRedLed.png",
       "iconOnHeight": 216,
-      "iconOff": "gfx\\StompDownRedLed.png",
+      "iconOff": "gfx/StompDownRedLed.png",
       "iconOffHeight": 0,
       "position": [
         310,
@@ -49,7 +49,7 @@
         5.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -71,7 +71,7 @@
         0.0,
         1.0
       ],
-      "iconEncoder": "gfx\\encoder.png",
+      "iconEncoder": "gfx/encoder.png",
       "iconEncoderHeight": 61,
       "enums": [
         "BBD",
@@ -97,7 +97,7 @@
         5.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -119,7 +119,7 @@
         0.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -145,15 +145,15 @@
     }
   ],
   "projectFileVersion": "1.0.0",
-  "companyLogo": "gfx\\BlackaddrLogo.png",
-  "pedalIcon": "gfx\\AnalogDelayIcon.png",
-  "basePedal": "gfx\\AnalogDelayBasePedal.png",
+  "companyLogo": "gfx/BlackaddrLogo.png",
+  "pedalIcon": "gfx/AnalogDelayIcon.png",
+  "basePedal": "gfx/AnalogDelayBasePedal.png",
   "publicHeaderFiles": [
-    "inc\\AnalogDelay.h"
+    "inc/AnalogDelay.h"
   ],
   "privateSourceFiles": [
-    "src\\AnalogDelayBase.cpp",
-    "src\\AnalogDelay.cpp",
-    "src\\AnalogDelayFilters.h"
+    "src/AnalogDelayBase.cpp",
+    "src/AnalogDelay.cpp",
+    "src/AnalogDelayFilters.h"
   ]
 }

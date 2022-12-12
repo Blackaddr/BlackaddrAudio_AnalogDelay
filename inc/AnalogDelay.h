@@ -66,6 +66,7 @@ public:
     void mapMidiControl(int parameter, int midiCC, int midiChannel = 0) override;
     void processMidi(int channel, int midiCC, int value) override;
     void setParam(int paramIndex, float paramValue) override;
+    float getUserParamValue(int paramIndex, float normalizedParamValue);
     const char* getName() override;
     const uint8_t* getRblk() override;
 
