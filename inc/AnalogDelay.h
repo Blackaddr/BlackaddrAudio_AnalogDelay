@@ -125,6 +125,7 @@ private:
 
     //!s - START_USER_PRIVATE_MEMBERS - put your private members below this line before the matching END
     bool m_extMemConfigured = false;
+    bool m_extMemIsCleared  = false;
     Aviate::SramMemSlot* m_slot = nullptr;
     //bool m_slotCleared = false;
     //static constexpr float FEEDBACK_LIMIT_F = 1.0f;
@@ -139,6 +140,7 @@ private:
     size_t m_delaySamples = 0;
 
     void m_configExtMem();
+    void m_clearExtMemory();
     void m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
     void m_postProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
 

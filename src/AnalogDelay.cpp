@@ -68,20 +68,31 @@ void AnalogDelay::update(void)
 {
     audio_block_t *inputAudioBlock = receiveReadOnly(); // get the next block of input samples
 
-    if (m_useExternalMemory && !m_extMemConfigured) {
+    // the following gate will not be passed until the memory is both configured
+    // and cleared
+    if (m_useExternalMemory && (!m_extMemConfigured || !m_extMemIsCleared) ) {
         // We can't enable this module until the SRAM Controller is available
-        if (!isSramReady()) {
-            if (inputAudioBlock) { release(inputAudioBlock); }
-            return;
-        } else {
+        if (isSramReady() && !m_extMemConfigured) {
             m_configExtMem();
         }
+
+        if (m_extMemConfigured && !m_extMemIsCleared) {
+            m_clearExtMemory();
+        }
+
+        if (inputAudioBlock) {
+            if (m_enable) {
+                transmit(inputAudioBlock);
+            }
+            release(inputAudioBlock);
+        }
+        return;
     }
 
     // Check is block is disabled
     if (m_enable == false) {
         // do not transmit or process any audio, return as quickly as possible.
-        if (inputAudioBlock) { release(inputAudioBlock); }
+        if (inputAudioBlock) { release(inputAudioBlock); inputAudioBlock = nullptr; }
 
         // release all held memory resources
         if (m_previousBlock) {
@@ -100,11 +111,10 @@ void AnalogDelay::update(void)
     }
 
     // Check is block is bypassed, if so either transmit input directly or create silence
-    if ((m_bypass == true) || !(inputAudioBlock) || !m_memory) {
+    if ((m_bypass == true) || !(inputAudioBlock)) {
 
         // transmit the input directly
         if (!inputAudioBlock) {
-
             // create silence
             inputAudioBlock = allocate();
             if (!inputAudioBlock) { return; } // failed to allocate
@@ -198,10 +208,9 @@ void AnalogDelay::m_postProcessing(audio_block_t *out, audio_block_t *dry, audio
 
 void AnalogDelay::m_configExtMem()
 {
-    if (!m_extMemConfigured){
-
+    if (!m_extMemConfigured) {
         // the delay cannot be exactly equal to the slot size, you need at least one sample so the wr/rd are not on top of each other.
-        m_slot = getSramManager()->requestMemory((m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t), true);  // true-> clear memory
+        m_slot = getSramManager()->requestMemory((m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t), false);  // false-> don't clear memory
         if (!m_slot) {
             EFX_PRINT(Serial.println("AnalogDelay::m_configExtMem(): ERROR creating memory slot"));
             return;
@@ -212,7 +221,27 @@ void AnalogDelay::m_configExtMem()
             m_slot = nullptr;
             return;
         }
+        m_slot->setWritePosition(0);
         m_extMemConfigured = true;
+    }
+}
+
+void AnalogDelay::m_clearExtMemory()
+{
+    static size_t memoryBytesToClear = (m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t);
+    static const unsigned NUM_BYTES_PER_WRITE = (4*AUDIO_SAMPLES_PER_BLOCK*sizeof(int16_t));
+
+    if (memoryBytesToClear > 0) {
+        size_t numBytes;
+        if (memoryBytesToClear > NUM_BYTES_PER_WRITE) { numBytes = NUM_BYTES_PER_WRITE;}
+        else { numBytes = memoryBytesToClear; }
+        // we will clear only a few blocks of memory at time in order to prevent delays in the audio service pipelin
+        m_slot-> zeroAdvance(numBytes);
+        memoryBytesToClear -= numBytes;
+    }
+
+    if (memoryBytesToClear == 0) {
+        m_extMemIsCleared = true;
     }
 }
 
