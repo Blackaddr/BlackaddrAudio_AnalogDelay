@@ -129,6 +129,7 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
 
 const uint8_t rblk[256] = TEENSY_AUDIO_BLOCK;
 const uint8_t* AnalogDelay::getRblk() { return rblk; }
-const char* AnalogDelay::getName() { return "Blackaddr Audio:Analog Delay"; }
+static constexpr char PROGMEM AnalogDelay_name[] = {0x42, 0x6c, 0x61, 0x63, 0x6b, 0x61, 0x64, 0x64, 0x72, 0x20, 0x41, 0x75, 0x64, 0x69, 0x6f, 0x3a, 0x41, 0x6e, 0x61, 0x6c, 0x6f, 0x67, 0x20, 0x44, 0x65, 0x6c, 0x61, 0x79, };
+const char* AnalogDelay::getName() { return AnalogDelay_name; }
 
 }
