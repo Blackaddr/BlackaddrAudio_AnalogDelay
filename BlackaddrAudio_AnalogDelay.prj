@@ -27,9 +27,9 @@
         1.0,
         1.0
       ],
-      "iconOn": "gfx/StompUpRedLed.png",
+      "iconOn": "gfx\\StompUpRedLed.png",
       "iconOnHeight": 216,
-      "iconOff": "gfx/StompDownRedLed.png",
+      "iconOff": "gfx\\StompDownRedLed.png",
       "iconOffHeight": 0,
       "position": [
         310,
@@ -46,10 +46,10 @@
         3,
         0.0,
         10.0,
-        5.0,
+        2.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx/pot.png",
+      "iconPot": "gfx\\pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -71,7 +71,7 @@
         0.0,
         1.0
       ],
-      "iconEncoder": "gfx/encoder.png",
+      "iconEncoder": "gfx\\encoder.png",
       "iconEncoderHeight": 61,
       "enums": [
         "BBD",
@@ -94,10 +94,10 @@
         3,
         0.0,
         10.0,
-        5.0,
+        4.599999904632568,
         0.1000000014901161
       ],
-      "iconPot": "gfx/pot.png",
+      "iconPot": "gfx\\pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -116,10 +116,10 @@
         3,
         0.0,
         10.0,
-        0.0,
+        2.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx/pot.png",
+      "iconPot": "gfx\\pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -138,22 +138,22 @@
         3,
         0.0,
         10.0,
-        8.0,
+        8.899999618530273,
         0.1000000014901161
       ],
       "userData": 0
     }
   ],
   "projectFileVersion": "1.0.0",
-  "companyLogo": "gfx/BlackaddrLogo.png",
-  "pedalIcon": "gfx/AnalogDelayIcon.png",
-  "basePedal": "gfx/AnalogDelayBasePedal.png",
+  "companyLogo": "gfx\\BlackaddrLogo.png",
+  "pedalIcon": "gfx\\AnalogDelayIcon.png",
+  "basePedal": "gfx\\AnalogDelayBasePedal.png",
   "publicHeaderFiles": [
-    "inc/AnalogDelay.h"
+    "inc\\AnalogDelay.h"
   ],
   "privateSourceFiles": [
-    "src/AnalogDelayBase.cpp",
-    "src/AnalogDelay.cpp",
-    "src/AnalogDelayFilters.h"
+    "src\\AnalogDelayBase.cpp",
+    "src\\AnalogDelay.cpp",
+    "src\\AnalogDelayFilters.h"
   ]
 }
