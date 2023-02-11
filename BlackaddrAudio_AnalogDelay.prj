@@ -30,7 +30,7 @@
       "iconOn": "gfx/StompUpRedLed.png",
       "iconOnHeight": 216,
       "iconOff": "gfx/StompDownRedLed.png",
-      "iconOffHeight": 0,
+      "iconOffHeight": 216,
       "position": [
         310,
         805
