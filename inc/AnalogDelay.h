@@ -33,6 +33,7 @@ public:
         Mix_e = 3,
         Feedback_e = 4,
         Volume_e = 5,
+        LongDelay_e = 6,
         NUM_CONTROLS
     };
 
@@ -76,6 +77,7 @@ public:
     void mix(float value);
     void feedback(float value);
     void volume(float value) override;
+    void longdelay(float value);
 
     //!s - START_USER_PUBLIC_MEMBERS - put your public members below this line before the matching END
 
@@ -120,6 +122,7 @@ private:
     float m_filter = 0.0f;
     float m_mix = 0.0f;
     float m_feedback = 0.0f;
+    float m_longdelay = 0.0f;
 
     audio_block_t* m_basicInputCheck(audio_block_t* inputAudioBlock, unsigned outputChannel);
 

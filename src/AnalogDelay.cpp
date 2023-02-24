@@ -183,7 +183,7 @@ void AnalogDelay::update(void)
 void AnalogDelay::m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet)
 {
     if ( out && dry && wet) {
-        gainAdjust(out, wet, m_feedback);
+        gainAdjust(out, wet, m_feedback, 2);
         combine(out, dry, out);
         m_iir->process(out->data, out->data, AUDIO_BLOCK_SAMPLES);
     } else if (dry) {
@@ -302,7 +302,12 @@ void AnalogDelay::delayFractionMax(float delayFraction)
 {
     if (!m_memory) { EFX_PRINT(Serial.println("delayFractionMax(): m_memory is not valid")); return; }
 
-    size_t delaySamples = static_cast<size_t>(static_cast<float>(m_memory->getMaxDelaySamples()) * delayFraction);
+    size_t delaySamples;
+    if (m_longdelay) {  // not 0.0, so enable long delay
+        delaySamples = static_cast<size_t>(static_cast<float>(m_memory->getMaxDelaySamples()) * delayFraction);
+    } else {  // 1/10th of max
+        delaySamples = static_cast<size_t>(static_cast<float>(m_memory->getMaxDelaySamples()) * delayFraction * 0.1f);
+    }
 
     //EFX_PRINT(Serial.printf("delay is %f\n\r", delayFraction); Serial.flush());
 
@@ -354,7 +359,26 @@ void AnalogDelay::mix(float value)
 void AnalogDelay::feedback(float value)
 {
     // perform any necessary conversion to user variables, validation, etc.
+    constexpr float DM3_MAX_FEEDBACK_F  = 1.0f;
+    constexpr float WARM_FEEDBACK_F     = 2.0f;
+    constexpr float DARK_MAX_FEEDBACK_F = 3.0f;
     m_feedback = value;
+
+    switch(static_cast<Filter>(m_filter)) {
+    case Filter::WARM : m_feedback *= WARM_FEEDBACK_F;     break;
+    case Filter::DARK : m_feedback *= DARK_MAX_FEEDBACK_F; break;
+    case Filter::DM3  :
+    default           : m_feedback *= DM3_MAX_FEEDBACK_F;  break;
+    }
+
+    m_feedback = m_feedback / 4.0f;
+}
+
+void AnalogDelay::longdelay(float value)
+{
+    // perform any necessary conversion to user variables, validation, etc.
+    m_longdelay = value;
+    delayFractionMax(m_delay);
 }
 
 void AnalogDelay::volume(float value)
