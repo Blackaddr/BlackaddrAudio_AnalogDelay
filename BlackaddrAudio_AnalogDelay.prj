@@ -15,7 +15,6 @@
   "cppClass": "BlackaddrAudio_AnalogDelay::AnalogDelay",
   "cppInstBase": "_BlackaddrAudio_AnalogDelay",
   "constructorParams": "3000.0f,true",
-  "type": 1,
   "controls": [
     {
       "name": "Bypass",
