@@ -31,6 +31,7 @@ void AnalogDelay::setParam(int paramIndex, float paramValue)
     case 3 : mix( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
     case 4 : feedback( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
     case 5 : volume( (paramValue - 0.000000) / (10.000000 - 0.000000) ); break;
+    case 6 : longdelay( (paramValue - 0.000000) / (1.000000 - 0.000000) ); break;
     default : break;
     }
 }
@@ -44,6 +45,7 @@ float AnalogDelay::getUserParamValue(int paramIndex, float normalizedParamValue)
     case 3 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // mix
     case 4 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // feedback
     case 5 : return ( ((10.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // volume
+    case 6 : return ( ((1.000000 - 0.000000) * normalizedParamValue) + 0.000000 ); // longdelay
     default : return 0.0f;
     }
 }
@@ -79,6 +81,11 @@ void AnalogDelay::processMidi(int channel, int control, int value)
 
     if ((m_midiConfig[Volume_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Volume_e][MIDI_CONTROL] == control)) {
         volume(val);
+        return;
+    }
+
+    if ((m_midiConfig[LongDelay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[LongDelay_e][MIDI_CONTROL] == control)) {
+        longdelay(val);
         return;
     }
 

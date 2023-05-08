@@ -9,12 +9,12 @@
   "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
   "numInputs": 1,
   "numOutputs": 1,
-  "numControls": 6,
+  "numControls": 7,
   "effectFilename": "BlackaddrAudio_AnalogDelay.efx",
   "libraryName": "BlackaddrAudio_AnalogDelay",
   "cppClass": "BlackaddrAudio_AnalogDelay::AnalogDelay",
   "cppInstBase": "_BlackaddrAudio_AnalogDelay",
-  "constructorParams": "2000.0f,true",
+  "constructorParams": "3000.0f,true",
   "controls": [
     {
       "name": "Bypass",
@@ -24,10 +24,10 @@
         0,
         0.0,
         1.0,
-        1.0,
+        0.0,
         1.0
       ],
-      "iconOn": "gfx\\StompUpRedLed.png",
+      "iconOn": "gfx/StompUpRedLed.png",
       "iconOnHeight": 216,
       "iconOff": "gfx/StompDownRedLed.png",
       "iconOffHeight": 216,
@@ -46,10 +46,10 @@
         3,
         0.0,
         10.0,
-        2.0,
+        5.0,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -68,10 +68,10 @@
         2,
         0.0,
         2.0,
-        0.0,
+        1.0,
         1.0
       ],
-      "iconEncoder": "gfx\\encoder.png",
+      "iconEncoder": "gfx/encoder.png",
       "iconEncoderHeight": 61,
       "enums": [
         "BBD",
@@ -97,12 +97,12 @@
         4.599999904632568,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
         493,
-        160
+        159
       ],
       "scalingRatio": 2.700000047683716,
       "supressValueLabel": 1,
@@ -116,10 +116,10 @@
         3,
         0.0,
         10.0,
-        2.0,
+        3.5,
         0.1000000014901161
       ],
-      "iconPot": "gfx\\pot.png",
+      "iconPot": "gfx/pot.png",
       "iconPotHeight": 70,
       "potFullRange": 1,
       "position": [
@@ -142,18 +142,35 @@
         0.1000000014901161
       ],
       "userData": 0
+    },
+    {
+      "name": "Long Delay",
+      "shortName": "LONGDLY",
+      "description": "Selects between a shorter maximum delay of 300 ms, or a longer max delay of 3000 ms.",
+      "config": [
+        0,
+        0.0,
+        1.0,
+        0.0,
+        1.0
+      ],
+      "iconOn": "gfx/toggleDown.png",
+      "iconOnHeight": 128,
+      "iconOff": "gfx/toggleUp.png",
+      "iconOffHeight": 128,
+      "userData": 0
     }
   ],
   "projectFileVersion": "1.0.0",
-  "companyLogo": "gfx\\BlackaddrLogo.png",
-  "pedalIcon": "gfx\\AnalogDelayIcon.png",
-  "basePedal": "gfx\\AnalogDelayBasePedal.png",
+  "companyLogo": "gfx/BlackaddrLogo.png",
+  "pedalIcon": "gfx/AnalogDelayIcon.png",
+  "basePedal": "gfx/AnalogDelayBasePedal.png",
   "publicHeaderFiles": [
-    "inc\\AnalogDelay.h"
+    "inc/AnalogDelay.h"
   ],
   "privateSourceFiles": [
-    "src\\AnalogDelayBase.cpp",
-    "src\\AnalogDelay.cpp",
-    "src\\AnalogDelayFilters.h"
+    "src/AnalogDelayBase.cpp",
+    "src/AnalogDelay.cpp",
+    "src/AnalogDelayFilters.h"
   ]
 }
