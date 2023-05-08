@@ -3,7 +3,7 @@
   "company": "Blackaddr Audio",
   "effectName": "Analog Delay",
   "effectVersion": "1.0",
-  "coreVersion": "1.0.0",
+  "coreVersion": "1.1.0",
   "effectShortName": "AnaDly",
   "effectCategory": "Delay",
   "effectDescription": "A warm analog-based delay with multiple filters for different flavours. Boss DM3 inspired.",
@@ -15,6 +15,7 @@
   "cppClass": "BlackaddrAudio_AnalogDelay::AnalogDelay",
   "cppInstBase": "_BlackaddrAudio_AnalogDelay",
   "constructorParams": "3000.0f,true",
+  "type": 1,
   "controls": [
     {
       "name": "Bypass",

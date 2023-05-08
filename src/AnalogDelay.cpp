@@ -185,9 +185,9 @@ void AnalogDelay::m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_
     if ( out && dry && wet) {
         gainAdjust(out, wet, m_feedback, 2);
         combine(out, dry, out);
-        m_iir->process(out->data, out->data, AUDIO_BLOCK_SAMPLES);
+        m_iir->process(out->data, out->data, AUDIO_SAMPLES_PER_BLOCK);
     } else if (dry) {
-        memcpy(out->data, dry->data, sizeof(int16_t) * AUDIO_BLOCK_SAMPLES);
+        memcpy(out->data, dry->data, sizeof(int16_t) * AUDIO_SAMPLES_PER_BLOCK);
     }
 }
 
@@ -199,7 +199,7 @@ void AnalogDelay::m_postProcessing(audio_block_t *out, audio_block_t *dry, audio
         // Simulate the LPF IIR nature of the analog systems
         alphaBlend(out, dry, wet, m_mix);
     } else if (dry) {
-        memcpy(out->data, dry->data, sizeof(int16_t) * AUDIO_BLOCK_SAMPLES);
+        memcpy(out->data, dry->data, sizeof(int16_t) * AUDIO_SAMPLES_PER_BLOCK);
     }
     // Set the output volume
     gainAdjust(out, out, m_volume/4.0f, 2);
@@ -210,7 +210,7 @@ void AnalogDelay::m_configExtMem()
 {
     if (!m_extMemConfigured) {
         // the delay cannot be exactly equal to the slot size, you need at least one sample so the wr/rd are not on top of each other.
-        m_slot = getSramManager()->requestMemory((m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t), false);  // false-> don't clear memory
+        m_slot = getSramManager()->requestMemory((m_maxDelaySamples + AUDIO_SAMPLES_PER_BLOCK) * sizeof(int16_t), false);  // false-> don't clear memory
         if (!m_slot) {
             EFX_PRINT(Serial.println("AnalogDelay::m_configExtMem(): ERROR creating memory slot"));
             return;
@@ -228,7 +228,7 @@ void AnalogDelay::m_configExtMem()
 
 void AnalogDelay::m_clearExtMemory()
 {
-    static size_t memoryBytesToClear = (m_maxDelaySamples + AUDIO_BLOCK_SAMPLES) * sizeof(int16_t);
+    static size_t memoryBytesToClear = (m_maxDelaySamples + AUDIO_SAMPLES_PER_BLOCK) * sizeof(int16_t);
     static const unsigned NUM_BYTES_PER_WRITE = (4*AUDIO_SAMPLES_PER_BLOCK*sizeof(int16_t));
 
     if (memoryBytesToClear > 0) {
@@ -261,7 +261,7 @@ void AnalogDelay::delayMs(float milliseconds)
         SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { Serial.println("ERROR: slot ptr is not valid");  return;}
 
-        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
+        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_SAMPLES_PER_BLOCK;
     }
 
     if (delaySamples > m_maxDelaySamples) {
@@ -286,7 +286,7 @@ void AnalogDelay::delaySamples(size_t numDelaySamples)
         SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
-        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
+        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_SAMPLES_PER_BLOCK;
     }
 
     if (numDelaySamples > m_maxDelaySamples) {
@@ -323,7 +323,7 @@ void AnalogDelay::delayFractionMax(float delayFraction)
         SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
-        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_BLOCK_SAMPLES;
+        m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_SAMPLES_PER_BLOCK;
     }
 
     if (delaySamples > m_maxDelaySamples) {
