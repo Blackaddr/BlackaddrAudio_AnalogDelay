@@ -223,6 +223,7 @@ void AnalogDelay::m_configExtMem()
         }
         m_slot->setWritePosition(0);
         m_extMemConfigured = true;
+        delayFractionMax(m_delay);
     }
 }
 
@@ -249,7 +250,7 @@ void AnalogDelay::delayMs(float milliseconds)
 {
     size_t delaySamples = calcAudioSamples(milliseconds);
 
-    if (!m_memory) { EFX_PRINT(Serial.println("delayMs(): m_memory is not valid")); return; }
+    //if (!m_memory) { EFX_PRINT(Serial.println("delayMs(): m_memory is not valid")); return; }
 
     if (!m_useExternalMemory) {
         // internal memory
