@@ -25,6 +25,9 @@ public:
     static constexpr unsigned NUM_INPUTS  = 1;
     static constexpr unsigned NUM_OUTPUTS = 1;
 
+    using AudioBlock    = audio_block_t;
+    using AudioDataType = int16_t;
+
     // List of effect control names
     enum {
         Bypass_e = 0,
@@ -65,7 +68,7 @@ public:
     // Standard EFX interface functions - do not change these declaration
     virtual void update(); // main audio processing loop function
     void mapMidiControl(int parameter, int midiCC, int midiChannel = 0) override;
-    void processMidi(int channel, int midiCC, int value) override;
+    void processMidi(int status, int data1, int data2) override;
     void setParam(int paramIndex, float paramValue) override;
     float getUserParamValue(int paramIndex, float normalizedParamValue);
     const char* getName() override;
@@ -80,6 +83,8 @@ public:
     void longdelay(float value);
 
     //!s - START_USER_PUBLIC_MEMBERS - put your public members below this line before the matching END
+
+    void disable() override;
 
     /// Set the delay in milliseconds.
     /// @param milliseconds the request delay in milliseconds. Must be less than max delay.
@@ -114,10 +119,10 @@ public:
     //!e - END_USER_PUBLIC_MEMBERS
 
 private:
-    audio_block_t *m_inputQueueArray[1]; // required by AudioStream base class, array size is num inputs
+    AudioBlock *m_inputQueueArray[NUM_INPUTS]; // required by AudioStream base class
     int m_midiConfig[NUM_CONTROLS][2]; // stores the midi parameter mapping
 
-    // m_bypass and m_volume are already provided by the base class AudioEffectWrapper
+    // m_bypass and m_volume are already provided by the base class AudioEffectWrapper or AudioEffectFloat
     float m_delay = 0.0f;
     float m_filter = 0.0f;
     float m_mix = 0.0f;
@@ -144,6 +149,7 @@ private:
 
     void m_configExtMem();
     void m_clearExtMemory();
+    void m_releaseAudioBuffers();
     void m_preProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
     void m_postProcessing(audio_block_t *out, audio_block_t *dry, audio_block_t *wet);
 

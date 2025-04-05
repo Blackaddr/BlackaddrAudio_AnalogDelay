@@ -9,6 +9,10 @@
 #include "Aviate/LibBasicFunctions.h"
 #include "AnalogDelay.h"
 
+#define audioBlockReceiveReadOnly receiveReadOnly
+#define audioBlockReceiveWritable receiveWritable
+#define audioBlockAllocate        allocate
+
 using namespace Aviate;
 
 namespace BlackaddrAudio_AnalogDelay {
@@ -50,45 +54,8 @@ float AnalogDelay::getUserParamValue(int paramIndex, float normalizedParamValue)
     }
 }
 
-void AnalogDelay::processMidi(int channel, int control, int value)
+void AnalogDelay::processMidi(int status, int data1, int data2)
 {
-    float val = (float)value / 127.0f;
-
-    if ((m_midiConfig[Bypass_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Bypass_e][MIDI_CONTROL] == control)) {
-        bypass(val);
-        return;
-    }
-
-    if ((m_midiConfig[Delay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Delay_e][MIDI_CONTROL] == control)) {
-        delay(val);
-        return;
-    }
-
-    if ((m_midiConfig[Filter_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Filter_e][MIDI_CONTROL] == control)) {
-        filter(val);
-        return;
-    }
-
-    if ((m_midiConfig[Mix_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Mix_e][MIDI_CONTROL] == control)) {
-        mix(val);
-        return;
-    }
-
-    if ((m_midiConfig[Feedback_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Feedback_e][MIDI_CONTROL] == control)) {
-        feedback(val);
-        return;
-    }
-
-    if ((m_midiConfig[Volume_e][MIDI_CHANNEL] == channel) && (m_midiConfig[Volume_e][MIDI_CONTROL] == control)) {
-        volume(val);
-        return;
-    }
-
-    if ((m_midiConfig[LongDelay_e][MIDI_CHANNEL] == channel) && (m_midiConfig[LongDelay_e][MIDI_CONTROL] == control)) {
-        longdelay(val);
-        return;
-    }
-
 }
 
 audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, unsigned outputChannel)
@@ -96,7 +63,7 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
     // Check if effect is disabled
     if (m_enable == false) {
         // do not transmit or process any audio, return as quickly as possible after releasing the inputs
-        if (inputAudioBlock) { release(inputAudioBlock); }
+        if (inputAudioBlock) { AudioStream::release(inputAudioBlock); }
         return nullptr; // disabled, no further EFX processing in update()
     }  // end of enable check
 
@@ -106,16 +73,16 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
         if (inputAudioBlock != nullptr) {
             // valid input, drive to outputChannel if specified
             if (outputChannel >= 0) {
-                transmit(inputAudioBlock, outputChannel); // drive to specified output
+                AudioStream::transmit(inputAudioBlock, outputChannel); // drive to specified output
             }
-            release(inputAudioBlock); // release the input block as we are done with it
+            AudioStream::release(inputAudioBlock); // release the input block as we are done with it
         } else { // invalid input block, allocate a block and drive silence if specified
             if (outputChannel >= 0) {
-                audio_block_t* silenceBlock = allocate();
+                audio_block_t* silenceBlock = AudioStream::allocate();
                 if (silenceBlock) {
                     clearAudioBlock(silenceBlock);  // create silence in the buffer
-                    transmit(silenceBlock, outputChannel);
-                    release(silenceBlock);
+                    AudioStream::transmit(silenceBlock, outputChannel);
+                    AudioStream::release(silenceBlock);
                 }
             }
         }
@@ -125,7 +92,7 @@ audio_block_t* AnalogDelay::m_basicInputCheck(audio_block_t* inputAudioBlock, un
     // If not disabled or bypassed, create silence if the input block is invalid then
     // return the valid audio block so update() can continue.
     if (inputAudioBlock == nullptr) {
-        inputAudioBlock = allocate();
+        inputAudioBlock = AudioStream::allocate();
         if (inputAudioBlock == nullptr) { return nullptr; } // check if allocate was unsuccessful
         // else
         clearAudioBlock(inputAudioBlock);

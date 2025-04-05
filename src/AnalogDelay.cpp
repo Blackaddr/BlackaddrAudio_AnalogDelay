@@ -11,7 +11,6 @@
 #include "AnalogDelay.h"
 #include "AnalogDelayFilters.h"
 
-using namespace baCore;
 using namespace Aviate;
 
 namespace BlackaddrAudio_AnalogDelay {
@@ -49,7 +48,7 @@ void AnalogDelay::setFilterCoeffs(int numStages, const int32_t *coeffs, int coef
 
 void AnalogDelay::setFilter(Filter filter)
 {
-    EFX_PRINT(Serial.printf("AnalogDelay::setFilter(): filter set to %d\n\r", (int)filter));
+    efxLogger.printf("AnalogDelay::setFilter(): filter set to %d\n", (int)filter);
     switch(filter) {
     case Filter::WARM :
         m_iir->changeFilterCoeffs(WARM_NUM_STAGES, reinterpret_cast<const int32_t *>(&WARM), WARM_COEFF_SHIFT);
@@ -93,20 +92,7 @@ void AnalogDelay::update(void)
     if (m_enable == false) {
         // do not transmit or process any audio, return as quickly as possible.
         if (inputAudioBlock) { release(inputAudioBlock); inputAudioBlock = nullptr; }
-
-        // release all held memory resources
-        if (m_previousBlock) {
-            release(m_previousBlock);
-            m_previousBlock = nullptr;
-        }
-        if (!m_useExternalMemory && m_memory) {
-            // when using internal memory we have to release all references in the ring buffer
-            while (m_memory->getRingBuffer()->size() > 0) {
-                audio_block_t *releaseBlock = m_memory->getRingBuffer()->front();
-                m_memory->getRingBuffer()->pop_front();
-                if (releaseBlock) { release(releaseBlock); }
-            }
-        }
+        m_releaseAudioBuffers();
         return;
     }
 
@@ -134,11 +120,13 @@ void AnalogDelay::update(void)
     // Otherwise perform normal processing
     // In order to make use of the SPI DMA, we need to request the read from memory first,
     // then do other processing while it fills in the back.
-    audio_block_t *blockToOutput = nullptr; // this will hold the output audio
-    blockToOutput = allocate();
-    if (!blockToOutput) {
+    audio_block_t *blockToOutput = allocate(); // this will hold the output audio
+    audio_block_t *preProcessed  = allocate();  // hold the preprocessed audio
+    if (!blockToOutput || !preProcessed) {  // check for allocation failures
         transmit(inputAudioBlock);
         release(inputAudioBlock);
+        if (blockToOutput) { release(blockToOutput); }
+        if (preProcessed) { release(preProcessed); }
         return; // skip this update cycle due to failure
     }
 
@@ -150,7 +138,6 @@ void AnalogDelay::update(void)
     // move on to input preprocessing
 
     // Preprocessing
-    audio_block_t *preProcessed = allocate();
     // mix the input with the feedback path in the pre-processing stage
     m_preProcessing(preProcessed, inputAudioBlock, m_previousBlock);
 
@@ -212,7 +199,7 @@ void AnalogDelay::m_configExtMem()
         // the delay cannot be exactly equal to the slot size, you need at least one sample so the wr/rd are not on top of each other.
         m_slot = getSramManager()->requestMemory((m_maxDelaySamples + AUDIO_SAMPLES_PER_BLOCK) * sizeof(int16_t), false);  // false-> don't clear memory
         if (!m_slot) {
-            EFX_PRINT(Serial.println("AnalogDelay::m_configExtMem(): ERROR creating memory slot"));
+            efxLogger.printf("AnalogDelay::m_configExtMem(): ERROR creating memory slot\n");
             return;
         }
 
@@ -246,21 +233,44 @@ void AnalogDelay::m_clearExtMemory()
     }
 }
 
+void AnalogDelay::m_releaseAudioBuffers()
+{
+    // release all held memory resources
+    if (m_previousBlock)  { release(m_previousBlock);  m_previousBlock  = nullptr; }
+    if (m_blockToRelease) { release(m_blockToRelease); m_blockToRelease = nullptr; }
+
+    if (!m_useExternalMemory && m_memory) {
+        // when using internal memory we have to release all references in the ring buffer
+        while (m_memory->getRingBuffer()->size() > 0) {
+            audio_block_t *releaseBlock = m_memory->getRingBuffer()->front();
+            m_memory->getRingBuffer()->pop_front();
+            if (releaseBlock) { release(releaseBlock); }
+        }
+    }
+}
+
+void AnalogDelay::disable()
+{
+    efxLogger.printf("AnalogDelay::disable() called, releasing resources\n");
+    m_releaseAudioBuffers();
+    m_enable = false;
+}
+
 void AnalogDelay::delayMs(float milliseconds)
 {
     size_t delaySamples = calcAudioSamples(milliseconds);
 
-    //if (!m_memory) { EFX_PRINT(Serial.println("delayMs(): m_memory is not valid")); return; }
+    //if (!m_memory) { efxLogger.printf("delayMs(): m_memory is not valid\n"); return; }
 
     if (!m_useExternalMemory) {
         // internal memory
         m_maxDelaySamples = m_memory->getMaxDelaySamples();
         //QueuePosition queuePosition = calcQueuePosition(milliseconds);
-        //Serial.println(String("CONFIG: delay:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset);
+        //efxLogger.printf("CONFIG: delay:%d  queue position:%d:%d\n", delaySamples, queuePosition.index, queuePosition.offset);
     } else {
         // external memory
         SramMemSlot *slot = m_memory->getSlot();
-        if (!slot) { Serial.println("ERROR: slot ptr is not valid");  return;}
+        if (!slot) { efxLogger.printf("ERROR: slot ptr is not valid\n");  return;}
 
         m_maxDelaySamples = (slot->size() / sizeof(int16_t))-AUDIO_SAMPLES_PER_BLOCK;
     }
@@ -274,16 +284,16 @@ void AnalogDelay::delayMs(float milliseconds)
 
 void AnalogDelay::delaySamples(size_t numDelaySamples)
 {
-    if (!m_memory) { EFX_PRINT(Serial.println("delaySamples(): m_memory is not valid")); return; }
+    if (!m_memory) { efxLogger.printf("delaySamples(): m_memory is not valid\n"); return; }
 
     if (!m_useExternalMemory) {
         // internal memory
         m_maxDelaySamples = m_memory->getMaxDelaySamples();
         //QueuePosition queuePosition = calcQueuePosition(delaySamples);
-        //Serial.println(String("CONFIG: delay:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset);
+        //efxLogger.printf("CONFIG: delay: %d  queue position: %d:%d\n", delaySamples, queuePosition.index, queuePosition.offset);
     } else {
         // external memory
-        //Serial.println(String("CONFIG: delay:") + delaySamples);
+        //efxLogger.printf("CONFIG: delay:%d\n", delaySamples);
         SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
@@ -295,13 +305,13 @@ void AnalogDelay::delaySamples(size_t numDelaySamples)
         numDelaySamples = m_maxDelaySamples;
     }
 
-    EFX_PRINT(Serial.printf("AnalogDelay::delaySamples(): delay samples set to %d\n\r", m_delaySamples));
+    efxLogger.printf("AnalogDelay::delaySamples(): delay samples set to %d\n", m_delaySamples);
     m_delaySamples = numDelaySamples;
 }
 
 void AnalogDelay::delayFractionMax(float delayFraction)
 {
-    if (!m_memory) { EFX_PRINT(Serial.println("delayFractionMax(): m_memory is not valid")); return; }
+    if (!m_memory) { efxLogger.printf("delayFractionMax(): m_memory is not valid\n"); return; }
 
     size_t delaySamples;
     if (m_longdelay) {  // not 0.0, so enable long delay
@@ -310,17 +320,17 @@ void AnalogDelay::delayFractionMax(float delayFraction)
         delaySamples = static_cast<size_t>(static_cast<float>(m_memory->getMaxDelaySamples()) * delayFraction * 0.1f);
     }
 
-    //EFX_PRINT(Serial.printf("delay is %f\n\r", delayFraction); Serial.flush());
+    //efxLogger.printf("delay is %f\n", delayFraction); efxLogger.flush();
 
     if (!m_useExternalMemory) {
         // internal memory
         m_maxDelaySamples = m_memory->getMaxDelaySamples();
         QueuePosition queuePosition = calcQueuePosition(delaySamples);
         (void)queuePosition;  // suppress warning in Release build
-        EFX_PRINT(Serial.println(String("Internal delay samples:") + delaySamples + String(" queue position ") + queuePosition.index + String(":") + queuePosition.offset));
+        efxLogger.printf("Internal delay samples: %d  queuePosition: %d:%d\n", delaySamples, queuePosition.index, queuePosition.offset);
     } else {
         // external memory
-        EFX_PRINT(Serial.println(String("External delay samples:") + delaySamples));
+        efxLogger.printf("External delay samples: %d\n", delaySamples);
         SramMemSlot *slot = m_memory->getSlot();
         if (!slot) { return; }
 
@@ -332,14 +342,14 @@ void AnalogDelay::delayFractionMax(float delayFraction)
         delaySamples = m_maxDelaySamples;
     }
     m_delaySamples = delaySamples;
-    EFX_PRINT(Serial.printf("AnalogDelay::delayFractionMax(): delay samples set to %d\n\r", m_delaySamples));
+    efxLogger.printf("AnalogDelay::delayFractionMax(): delay samples set to %d\n", m_delaySamples);
 }
 
 
 void AnalogDelay::filter(float value)
 {
     // perform any necessary conversion to user variables, validation, etc.
-    EFX_PRINT(Serial.printf("AnalogDelay::filter(): value is %f\n\r", value));
+    efxLogger.printf("AnalogDelay::filter(): value is %f\n", value);
     m_filter = std::roundf(value * static_cast<float>(static_cast<unsigned>(Filter::NUM_FILTERS)-1));
     setFilter(static_cast<Filter>(m_filter));
 }
